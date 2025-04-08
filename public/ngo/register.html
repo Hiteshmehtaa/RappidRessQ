@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NGO Registration - Animal Rescue Platform</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="animated-background"></div>
+    <nav class="navbar">
+        <div class="nav-brand">Animal Rescue</div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/ngo/login.html">NGO Login</a>
+            <a href="/volunteer.html">Volunteer</a>
+            <a href="/adopt.html">Adopt</a>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <h2 class="auth-title">NGO Registration</h2>
+        <form class="auth-form" id="ngoRegisterForm">
+            <input type="text" name="name" class="form-control" placeholder="NGO Name" required>
+            <input type="email" name="email" class="form-control" placeholder="Email" required>
+            <input type="password" name="password" class="form-control" placeholder="Password" required>
+            <input type="text" name="registrationNumber" class="form-control" placeholder="Registration Number" required>
+            <textarea name="address" class="form-control" placeholder="Address" required></textarea>
+            <input type="tel" name="phone" class="form-control" placeholder="Phone Number" required>
+            <button type="submit" class="btn-primary">Register</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('ngoRegisterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch('/api/ngo/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    alert('Registration successful! Please login.');
+                    window.location.href = '/ngo/login.html';
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Registration failed');
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+    </script>
+</body>
+</html>

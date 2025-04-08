@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adopt - RapidResQ</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/master/svgs/solid/paw.svg" alt="RapidResQ" class="nav-logo">
+            <span>RapidResQ</span>
+        </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/ngo/login.html">NGO Login</a>
+            <a href="/volunteer.html">Volunteer</a>
+            <a href="/adopt.html" class="active">Adopt</a>
+        </div>
+    </nav>
+
+    <div class="adoption-container">
+        <h2 class="section-title">Available for Adoption</h2>
+        <div class="animals-grid" id="animalsGrid">
+            <div class="animal-card">
+                <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1" alt="Dog" class="animal-image">
+                <div class="animal-info">
+                    <h3>Max</h3>
+                    <p>Labrador Retriever • 2 years old</p>
+                    <p class="ngo-info">From: Happy Paws NGO</p>
+                    <button class="btn-primary adopt-btn" onclick="showAdoptionForm('Max', 'Labrador Retriever', 'Happy Paws NGO')">Adopt Me</button>
+                </div>
+            </div>
+            <div class="animal-card">
+                <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba" alt="Cat" class="animal-image">
+                <div class="animal-info">
+                    <h3>Luna</h3>
+                    <p>Persian Cat • 1.5 years old</p>
+                    <p class="ngo-info">From: Feline Friends NGO</p>
+                    <button class="btn-primary adopt-btn" onclick="showAdoptionForm('Luna', 'Persian Cat', 'Feline Friends NGO')">Adopt Me</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adoption Form Modal -->
+    <div id="adoptionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAdoptionModal()">&times;</span>
+            <h2>Adoption Application</h2>
+            <form id="adoptionForm" class="auth-form">
+                <input type="hidden" id="petName" name="petName">
+                <input type="hidden" id="petBreed" name="petBreed">
+                <input type="hidden" id="ngoName" name="ngoName">
+                
+                <div class="form-group">
+                    <input type="text" class="form-control" name="fullName" placeholder="Full Name" required>
+                </div>
+                
+                <div class="form-group">
+                    <input type="email" class="form-control" name="email" placeholder="Email" required>
+                </div>
+                
+                <div class="form-group">
+                    <input type="tel" class="form-control" name="phone" placeholder="Phone Number" required>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" class="form-control" name="address" placeholder="Home Address" required>
+                </div>
+                
+                <div class="form-group">
+                    <select class="form-control" name="housingType" required>
+                        <option value="">Select Housing Type</option>
+                        <option value="house">House</option>
+                        <option value="apartment">Apartment</option>
+                        <option value="condo">Condo</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Do you have a yard?</label>
+                    <div class="radio-group">
+                        <input type="radio" name="hasYard" value="yes" required> Yes
+                        <input type="radio" name="hasYard" value="no"> No
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Have you owned pets before?</label>
+                    <div class="radio-group">
+                        <input type="radio" name="hadPets" value="yes" required> Yes
+                        <input type="radio" name="hadPets" value="no"> No
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <textarea class="form-control" name="petExperience" placeholder="If yes, please describe your experience with pets..." rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Do you have other pets currently?</label>
+                    <div class="radio-group">
+                        <input type="radio" name="hasCurrentPets" value="yes" required> Yes
+                        <input type="radio" name="hasCurrentPets" value="no"> No
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <textarea class="form-control" name="currentPets" placeholder="If yes, please list your current pets..." rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <input type="number" class="form-control" name="hoursAlone" placeholder="Hours pet will be alone per day" required>
+                </div>
+                
+                <div class="form-group">
+                    <textarea class="form-control" name="adoptionReason" placeholder="Why do you want to adopt this pet?" required rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Have you ever bred dogs or cats?</label>
+                    <div class="radio-group">
+                        <input type="radio" name="hasBreedingExperience" value="yes" required> Yes
+                        <input type="radio" name="hasBreedingExperience" value="no"> No
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <textarea class="form-control" name="breedingExperience" placeholder="If yes, please describe your breeding experience..." rows="3"></textarea>
+                </div>
+                
+                <button type="submit" class="btn-primary">Submit Application</button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .adoption-container {
+            max-width: 1200px;
+            margin: 100px auto;
+            padding: 0 20px;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+        }
+        
+        .animals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+        
+        .animal-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .animal-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .animal-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        
+        .animal-info {
+            padding: 1.5rem;
+        }
+        
+        .animal-info h3 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .animal-info p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .adopt-btn {
+            width: 100%;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 2rem;
+            margin: 0.5rem 0;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-content {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .ngo-info {
+            color: #4a90e2;
+            font-style: italic;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-logo {
+            width: 24px;
+            height: 24px;
+            filter: invert(1);
+        }
+
+        /* Add responsive styles */
+        @media (max-width: 1024px) {
+            .adoption-container {
+                margin: 80px auto;
+                padding: 0 15px;
+            }
+
+            .animals-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .nav-brand {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .animals-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+
+            .modal-content {
+                width: 90%;
+                margin: 20px auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .animals-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .animal-card {
+                margin: 1rem 0;
+            }
+        }
+    </style>
+
+    <script>
+        // Add this function to fetch and display all available animals
+        async function fetchAnimals() {
+            try {
+                const response = await fetch('/api/animals');
+                const animals = await response.json();
+                
+                const animalsGrid = document.getElementById('animalsGrid');
+                animalsGrid.innerHTML = animals.map(animal => `
+                    <div class="animal-card">
+                        <img src="${animal.image}" alt="${animal.name}" class="animal-image">
+                        <div class="animal-info">
+                            <h3>${animal.name}</h3>
+                            <p>${animal.breed} • ${animal.age} years old</p>
+                            <p class="ngo-info">From: ${animal.ngoName}</p>
+                            <button class="btn-primary adopt-btn" onclick="showAdoptionForm('${animal.name}', '${animal.breed}', '${animal.ngoId}')">
+                                Adopt Me
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error fetching animals:', error);
+            }
+        }
+
+        // Call fetchAnimals when the page loads
+        document.addEventListener('DOMContentLoaded', fetchAnimals);
+
+        function showAdoptionForm(petName, petBreed, ngoName) {
+            document.getElementById('petName').value = petName;
+            document.getElementById('petBreed').value = petBreed;
+            document.getElementById('ngoName').value = ngoName;
+            document.getElementById('adoptionModal').style.display = 'block';
+        }
+        
+        function closeAdoptionModal() {
+            document.getElementById('adoptionModal').style.display = 'none';
+            document.getElementById('adoptionForm').reset();
+        }
+        
+        document.getElementById('adoptionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch('/api/adopt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    alert('Adoption application submitted successfully!');
+                    closeAdoptionModal();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to submit application');
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('adoptionModal');
+            if (event.target === modal) {
+                closeAdoptionModal();
+            }
+        }
+    </script>
+</body>
+</html>

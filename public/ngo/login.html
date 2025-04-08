@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NGO Login - Animal Rescue Platform</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="animated-background"></div>
+    <nav class="navbar">
+        <div class="nav-brand">Animal Rescue</div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/ngo/login.html" class="active">NGO Login</a>
+            <a href="/volunteer.html">Volunteer</a>
+            <a href="/adopt.html">Adopt</a>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <h2 class="auth-title">NGO Login</h2>
+        <form class="auth-form" id="ngoLoginForm">
+            <input type="email" name="email" class="form-control" placeholder="Email" required>
+            <input type="password" name="password" class="form-control" placeholder="Password" required>
+            <button type="submit" class="btn-primary">Login</button>
+            <p style="text-align: center; margin-top: 1rem;">
+                Not registered? <a href="/ngo/register.html" style="color: #3498db;">Register here</a>
+            </p>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('ngoLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch('/api/ngo/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    const { token } = await response.json();
+                    localStorage.setItem('ngoToken', token);
+                    window.location.href = '/ngo/dashboard';
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Login failed');
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+    </script>
+</body>
+</html>

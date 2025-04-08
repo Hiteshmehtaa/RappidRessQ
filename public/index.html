@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RapidResQ - Emergency Animal Rescue</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Add styles for the report form */
+        .report-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .description-field {
+            background: white;
+            border: 2px solid #e1e1e1;
+            border-radius: 12px;
+            padding: 1rem;
+            width: 100%;
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .description-field:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            outline: none;
+        }
+
+        .description-label {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .preview-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .preview-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #map {
+            height: 300px;
+            border-radius: 12px;
+            margin: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .location-status {
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .location-status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .location-status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .camera-controls button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #2c3e50;
+            border: 2px solid #e1e1e1;
+        }
+
+        .btn-primary:hover {
+            background: #43A047;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/master/svgs/solid/paw.svg" alt="RapidResQ" class="nav-logo">
+            <span>RapidResQ</span>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="active">Home</a>
+            <a href="/ngo/login.html">NGO Login</a>
+            <a href="/volunteer.html">Volunteer</a>
+            <a href="/adopt.html">Adopt</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Swift Action, Saving Lives</h1>
+                <p class="hero-subtitle">Every second counts in animal rescue. Report, help, and make a difference today.</p>
+                <button id="reportBtn" class="btn-primary pulse">Report Emergency</button>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <h3>500+</h3>
+                    <p>Animals Rescued</p>
+                </div>
+                <div class="stat-card">
+                    <h3>50+</h3>
+                    <p>Partner NGOs</p>
+                </div>
+                <div class="stat-card">
+                    <h3>1000+</h3>
+                    <p>Volunteers</p>
+                </div>
+            </div>
+        </section>
+
+        <div id="reportModal" class="modal">
+            <div class="modal-content report-modal">
+                <span class="close">&times;</span>
+                <h2>Report Emergency</h2>
+                <form id="reportForm" class="report-form">
+                    <div class="camera-section">
+                        <div id="camera-container">
+                            <video id="camera-feed" autoplay playsinline></video>
+                            <canvas id="photo-canvas" style="display: none;"></canvas>
+                        </div>
+                        <div id="preview" class="preview-container"></div>
+                        <div class="camera-controls">
+                            <button type="button" id="capture-btn" class="btn-primary">Take Photo</button>
+                            <button type="button" id="retake-btn" class="btn-secondary" style="display: none;">Retake</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description" class="description-label">Description:</label>
+                        <textarea 
+                            id="description" 
+                            class="description-field"
+                            required 
+                            placeholder="Please describe the animal's condition and location in detail..."
+                        ></textarea>
+                    </div>
+                    <div id="map"></div>
+                    <div id="location-status" class="location-status"></div>
+                    <div id="loading" class="loading"></div>
+                    <button type="submit" class="btn-primary submit-btn">Submit Report</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

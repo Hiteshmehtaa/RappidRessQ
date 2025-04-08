@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NGO Dashboard - RapidResQ</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2c3e50;
+            --background-color: #f8f9fa;
+            --text-color: #333;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--secondary-color);
+            color: white;
+            padding: 2rem;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo img {
+            width: 32px;
+            height: 32px;
+            filter: invert(1);
+        }
+
+        .sidebar-logo span {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 2rem;
+            flex-grow: 1;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: background 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .data-table {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .status-in-progress { background: #cce5ff; color: #004085; }
+        .status-completed { background: #d4edda; color: #155724; }
+
+        .action-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin: 0.25rem;
+        }
+
+        .action-button:hover {
+            background: #43A047;
+        }
+
+        .add-animal-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-animal-btn:hover {
+            background: #43A047;
+            transform: translateY(-2px);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #ccc;
+            margin-bottom: 1rem;
+        }
+
+        .report-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 2rem;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 1.5rem;
+            top: 1.5rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        #photoPreview {
+            width: 100%;
+            height: 200px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        #photoPreview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .animals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        .animal-card {
+            position: relative;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .animal-image-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .animal-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .animal-info {
+            padding: 1rem;
+        }
+
+        .animal-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .animal-card:hover .animal-actions {
+            opacity: 1;
+        }
+
+        .action-icon {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .action-icon.delete {
+            background: #ff4444;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .animals-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+
+            .data-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .animals-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/master/svgs/solid/paw.svg" alt="RapidResQ">
+                <span>RapidResQ</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" class="menu-item active" data-section="overview"><i class="fas fa-chart-line"></i> Overview</a></li>
+                <li><a href="#" class="menu-item" data-section="reports"><i class="fas fa-exclamation-circle"></i> Reports</a></li>
+                <li><a href="#" class="menu-item" data-section="adoptions"><i class="fas fa-heart"></i> Adoptions</a></li>
+                <li><a href="#" class="menu-item" data-section="volunteers"><i class="fas fa-hands-helping"></i> Volunteers</a></li>
+                <li><a href="#" class="menu-item" data-section="animals"><i class="fas fa-paw"></i> Our Animals</a></li>
+                <li><a href="#" class="menu-item" data-section="settings"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </aside>
+
+        <main class="main-content">
+            <section id="overview" class="section active">
+                <div class="section-header">
+                    <h2 class="section-title">Overview</h2>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3 id="totalReports">0</h3>
+                        <p>Total Reports</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="pendingAdoptions">0</h3>
+                        <p>Pending Adoptions</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="activeVolunteers">0</h3>
+                        <p>Active Volunteers</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="totalAnimals">0</h3>
+                        <p>Total Animals</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="reports" class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Reports</h2>
+                </div>
+                <div id="reportsTable"></div>
+            </section>
+
+            <section id="adoptions" class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Adoption Applications</h2>
+                </div>
+                <div id="adoptionsTable"></div>
+            </section>
+
+            <section id="volunteers" class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Volunteer Applications</h2>
+                </div>
+                <div id="volunteersTable"></div>
+            </section>
+
+            <section id="animals" class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Our Animals</h2>
+                    <button class="add-animal-btn" onclick="showAddAnimalModal()">
+                        <i class="fas fa-plus"></i> Add Animal
+                    </button>
+                </div>
+                <div id="animalsGrid" class="animals-grid"></div>
+            </section>
+
+            <section id="settings" class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Settings</h2>
+                </div>
+                <form id="settingsForm" class="settings-form">
+                    <!-- Settings form content will be dynamically loaded -->
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Animal Modal -->
+    <div id="addAnimalModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddAnimalModal()">&times;</span>
+            <h2>Add New Animal</h2>
+            <form id="addAnimalForm">
+                <div id="photoPreview">
+                    <span>Click to add photo</span>
+                </div>
+                <input type="file" id="animalPhoto" accept="image/*" style="display: none">
+                
+                <div class="form-group">
+                    <input type="text" class="form-control" name="name" placeholder="Animal Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" name="breed" placeholder="Breed" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" name="age" placeholder="Age (in years)" required min="0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <select class="form-control" name="status" required>
+                        <option value="available">Available</option>
+                        <option value="pending">Pending</option>
+                        <option value="adopted">Adopted</option>
+                    </select>
+                </div>
+                <button type="submit" class="action-button">Add Animal</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('ngoToken');
+        if (!token) {
+            window.location.href = '/ngo/login.html';
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('ngoToken');
+            window.location.href = '/ngo/login.html';
+        }
+
+        // Show/hide sections
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+        }
+
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = e.target.getAttribute('data-section');
+                showSection(section);
+            });
+        });
+
+        // Add Animal Modal
+        const addAnimalModal = document.getElementById('addAnimalModal');
+        const photoPreview = document.getElementById('photoPreview');
+        const photoInput = document.getElementById('animalPhoto');
+
+        function showAddAnimalModal() {
+            addAnimalModal.style.display = 'block';
+        }
+
+        function closeAddAnimalModal() {
+            addAnimalModal.style.display = 'none';
+            document.getElementById('addAnimalForm').reset();
+            photoPreview.innerHTML = '<span>Click to add photo</span>';
+        }
+
+        photoPreview.addEventListener('click', () => {
+            photoInput.click();
+        });
+
+        photoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    photoPreview.innerHTML = `<img src="${e.target.result}" alt="Animal preview">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Delete Animal
+        async function deleteAnimal(animalId) {
+            if (!confirm('Are you sure you want to delete this animal?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/ngo/animals/${animalId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    fetchData();
+                } else {
+                    throw new Error('Failed to delete animal');
+                }
+            } catch (error) {
+                alert('Error deleting animal: ' + error.message);
+            }
+        }
+
+        // Complete Report
+        async function completeReport(reportId) {
+            if (!confirm('Are you sure you want to mark this report as completed? This will remove it from the list.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/ngo/reports/${reportId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: 'completed' })
+                });
+
+                if (response.ok) {
+                    fetchData();
+                } else {
+                    throw new Error('Failed to complete report');
+                }
+            } catch (error) {
+                alert('Error completing report: ' + error.message);
+            }
+        }
+
+        // Update Report Status
+        async function updateReportStatus(reportId, status) {
+            try {
+                const response = await fetch(`/api/ngo/reports/${reportId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status })
+                });
+
+                if (response.ok) {
+                    fetchData();
+                } else {
+                    throw new Error('Failed to update status');
+                }
+            } catch (error) {
+                alert('Error updating status: ' + error.message);
+            }
+        }
+
+        // Add Animal Form Submission
+        document.getElementById('addAnimalForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const photoFile = photoInput.files[0];
+            if (photoFile) {
+                formData.append('photo', photoFile);
+            }
+
+            try {
+                const response = await fetch('/api/ngo/animals', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('Animal added successfully!');
+                    closeAddAnimalModal();
+                    fetchData();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to add animal');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+
+        // Fetch and update data
+        async function fetchData() {
+            try {
+                const [reportsRes, adoptionsRes, volunteersRes, animalsRes] = await Promise.all([
+                    fetch('/api/ngo/dashboard/reports', { 
+                        headers: { 
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }),
+                    fetch('/api/ngo/dashboard/adoptions', { 
+                        headers: { 
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }),
+                    fetch('/api/ngo/dashboard/volunteers', { 
+                        headers: { 
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }),
+                    fetch('/api/ngo/animals', { 
+                        headers: { 
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                ]);
+
+                const [reports, adoptions, volunteers, animals] = await Promise.all([
+                    reportsRes.json(),
+                    adoptionsRes.json(),
+                    volunteersRes.json(),
+                    animalsRes.json()
+                ]);
+
+                // Update overview stats
+                document.getElementById('totalReports').textContent = reports.length;
+                document.getElementById('pendingAdoptions').textContent = adoptions.filter(a => a.status === 'pending').length;
+                document.getElementById('activeVolunteers').textContent = volunteers.filter(v => v.status === 'approved').length;
+                document.getElementById('totalAnimals').textContent = animals.length;
+
+                // Update reports table
+                document.getElementById('reportsTable').innerHTML = reports.length ? `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Photo</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Assigned To</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${reports.map(report => `
+                                <tr>
+                                    <td>${new Date(report.createdAt).toLocaleDateString()}</td>
+                                    <td><img src="${report.photo}" class="report-image" alt="Report"></td>
+                                    <td>${report.description}</td>
+                                    <td><span class="status-badge status-${report.status}">${report.status}</span></td>
+                                    <td>${report.assignedNGO || 'Unassigned'}</td>
+                                    <td>
+                                        ${report.status === 'pending' ? `
+                                            <button class="action-button" onclick="updateReportStatus('${report._id}', 'in-progress')">
+                                                Take Action
+                                            </button>
+                                        ` : report.status === 'in-progress' ? `
+                                            <button class="action-button" onclick="completeReport('${report._id}')">
+                                                Mark Complete
+                                            </button>
+                                        ` : ''}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                ` : `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>No reports found</p>
+                    </div>
+                `;
+
+                // Update adoptions table
+                document.getElementById('adoptionsTable').innerHTML = adoptions.length ? `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Pet Name</th>
+                                <th>Applicant</th>
+                                <th>Contact</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${adoptions.map(adoption => `
+                                <tr>
+                                    <td>${new Date(adoption.createdAt).toLocaleDateString()}</td>
+                                    <td>${adoption.petName}</td>
+                                    <td>${adoption.fullName}</td>
+                                    <td>${adoption.email}<br>${adoption.phone}</td>
+                                    <td><span class="status-badge status-${adoption.status}">${adoption.status}</span></td>
+                                    <td>
+                                        ${adoption.status === 'pending' ? `
+                                            <button class="action-button" onclick="updateAdoptionStatus('${adoption._id}', 'approved')">
+                                                Approve
+                                            </button>
+                                            <button class="action-button" onclick="updateAdoptionStatus('${adoption._id}', 'rejected')" style="background: #dc3545;">
+                                                Reject
+                                            </button>
+                                        ` : ''}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                ` : `
+                    <div class="empty-state">
+                        <i class="fas fa-heart"></i>
+                        <p>No adoption applications found</p>
+                    </div>
+                `;
+
+                // Update volunteers table
+                document.getElementById('volunteersTable').innerHTML = volunteers.length ? `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Name</th>
+                                <th>Contact</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${volunteers.map(volunteer => `
+                                <tr>
+                                    <td>${new Date(volunteer.createdAt).toLocaleDateString()}</td>
+                                    <td>${volunteer.fullName}</td>
+                                    <td>${volunteer.email}<br>${volunteer.phone}</td>
+                                    <td><span class="status-badge status-${volunteer.status}">${volunteer.status}</span></td>
+                                    <td>
+                                        ${volunteer.status === 'pending' ? `
+                                            <button class="action-button" onclick="updateVolunteerStatus('${volunteer._id}', 'approved')">
+                                                Approve
+                                            </button>
+                                            <button class="action-button" onclick="updateVolunteerStatus('${volunteer._id}', 'rejected')" style="background: #dc3545;">
+                                                Reject
+                                            </button>
+                                        ` : ''}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                ` : `
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <p>No volunteer applications found</p>
+                    </div>
+                `;
+
+                // Update animals grid
+                document.getElementById('animalsGrid').innerHTML = animals.length ? 
+                    animals.map(animal => `
+                        <div class="animal-card">
+                            <div class="animal-image-container">
+                                <img src="${animal.image}" alt="${animal.name}" class="animal-image">
+                                <div class="animal-actions">
+                                    <span class="action-icon delete" onclick="deleteAnimal('${animal._id}')" title="Delete Animal">
+                                        <i class="fas fa-trash"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="animal-info">
+                                <h3>${animal.name}</h3>
+                                <p>${animal.breed} • ${animal.age} years old</p>
+                                <span class="status-badge status-${animal.status}">${animal.status}</span>
+                            </div>
+                        </div>
+                    `).join('') : `
+                        <div class="empty-state">
+                            <i class="fas fa-paw"></i>
+                            <p>No animals added yet</p>
+                        </div>
+                    `;
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Initial data fetch
+        fetchData();
+
+        // Refresh data every 30 seconds
+        setInterval(fetchData, 30000);
+
+        // Close modal when clicking outside
+        window.onclick = (event) => {
+            if (event.target === addAnimalModal) {
+                closeAddAnimalModal();
+            }
+        }
+    </script>
+</body>
+</html>

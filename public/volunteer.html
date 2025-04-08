@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer - Animal Rescue Platform</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="animated-background"></div>
+    <nav class="navbar">
+        <div class="nav-brand">Animal Rescue</div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/ngo/login.html">NGO Login</a>
+            <a href="/volunteer.html" class="active">Volunteer</a>
+            <a href="/adopt.html">Adopt</a>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <h2 class="auth-title">Volunteer Application</h2>
+        <form class="auth-form" id="volunteerForm">
+            <input type="text" class="form-control" placeholder="Full Name" required>
+            <input type="email" class="form-control" placeholder="Email" required>
+            <input type="tel" class="form-control" placeholder="Phone Number" required>
+            <textarea class="form-control" placeholder="Why do you want to volunteer?" required rows="4"></textarea>
+            <button type="submit" class="btn-primary">Submit Application</button>
+        </form>
+    </div>
+
+    <script src="/js/volunteer.js"></script>
+</body>
+</html>
