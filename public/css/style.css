@@ -1,157 +1,3 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
-
-.report-modal {
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 2rem;
-}
-
-.camera-section {
-    position: relative;
-    margin-bottom: 2rem;
-}
-
-#camera-container {
-    width: 100%;
-    max-height: 400px;
-    overflow: hidden;
-    border-radius: 10px;
-    background: #f5f5f5;
-}
-
-#camera-feed {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
-.preview-container {
-    width: 100%;
-    max-height: 400px;
-    overflow: hidden;
-    border-radius: 10px;
-    margin-top: 1rem;
-}
-
-.preview-container img {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
-.camera-controls {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-    justify-content: center;
-}
-
-.map-container {
-    height: 300px;
-    margin: 1rem 0;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.submit-btn {
-    width: 100%;
-    margin-top: 1rem;
-}
-
-/* Update existing navbar styles */
-.navbar {
-    background: white;
-    padding: 1rem 2rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-}
-
-.nav-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.nav-logo {
-    height: 32px;
-    width: auto;
-}
-
-.nav-brand span {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #2c3e50;
-}
-
-/* Login page alignment fixes */
-.auth-container {
-    max-width: 400px;
-    margin: 120px auto 40px;
-    padding: 2rem;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.auth-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.auth-form input {
-    width: 100%;
-    padding: 0.8rem;
-    border: 2px solid #eee;
-    border-radius: 8px;
-    font-size: 1rem;
-}
-
-.auth-form button {
-    width: 100%;
-    padding: 1rem;
-    border: none;
-    border-radius: 8px;
-    background: #4CAF50;
-    color: white;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.auth-form button:hover {
-    background: #43A047;
-}
-
-/* Add responsive design improvements */
-@media (max-width: 768px) {
-    .report-modal {
-        width: 95%;
-        margin: 10px auto;
-    }
-
-    .camera-controls {
-        flex-direction: column;
-    }
-
-    .auth-container {
-        margin: 80px 20px;
-    }
-}
-
 :root {
     --primary-color: #4CAF50;
     --secondary-color: #2196F3;
@@ -160,6 +6,13 @@
     --light-gray: #f5f5f5;
     --border-radius: 10px;
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
 }
 
 body {
@@ -173,14 +26,14 @@ body {
     background: white;
     padding: 1rem 2rem;
     box-shadow: var(--shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 1000;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
 .nav-brand {
@@ -191,6 +44,13 @@ body {
 
 .nav-logo {
     height: 40px;
+    width: auto;
+}
+
+.nav-brand span {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c3e50;
 }
 
 .nav-links {
@@ -397,6 +257,66 @@ body {
     cursor: pointer;
 }
 
+/* Report Modal */
+.report-modal {
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2rem;
+}
+
+.camera-section {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+#camera-container {
+    width: 100%;
+    max-height: 400px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #f5f5f5;
+}
+
+#camera-feed {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.preview-container {
+    width: 100%;
+    max-height: 400px;
+    overflow: hidden;
+    border-radius: 10px;
+    margin-top: 1rem;
+}
+
+.preview-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.camera-controls {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    justify-content: center;
+}
+
+.map-container, #map {
+    height: 300px;
+    margin: 1rem 0;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.submit-btn {
+    width: 100%;
+    margin-top: 1rem;
+}
+
 /* Forms */
 .form-group {
     margin-bottom: 1.5rem;
@@ -415,69 +335,48 @@ body {
     outline: none;
 }
 
-/* Footer */
-.footer {
-    background: #333;
+.description-field {
+    min-height: 100px;
+}
+
+/* Auth Styles */
+.auth-container {
+    max-width: 400px;
+    margin: 120px auto 40px;
+    padding: 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #eee;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.auth-form button {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary-color);
     color: white;
-    padding: 4rem 2rem 2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
-.footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-}
-
-.footer-section h3 {
-    margin-bottom: 1rem;
-}
-
-.footer-section ul {
-    list-style: none;
-}
-
-.footer-section ul li {
-    margin-bottom: 0.5rem;
-}
-
-.footer-section a {
-    color: white;
-    text-decoration: none;
-}
-
-.footer-bottom {
-    text-align: center;
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Animations */
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-.pulse {
-    animation: pulse 2s infinite;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .hero h1 {
-        font-size: 3rem;
-    }
-
-    .hero-stats {
-        flex-direction: column;
-    }
-
-    .nav-links {
-        display: none;
-    }
+.auth-form button:hover {
+    background: #43A047;
 }
 
 /* Dashboard Styles */
@@ -587,10 +486,307 @@ body {
     background: #e3f2fd;
 }
 
-/* Map Container */
-#map {
+/* Footer */
+.footer {
+    background: #333;
+    color: white;
+    padding: 4rem 2rem 2rem;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.footer-section h3 {
+    margin-bottom: 1rem;
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section ul li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-section a {
+    color: white;
+    text-decoration: none;
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.report-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.description-label {
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.description-field {
+    background: white;
+    border: 2px solid #e1e1e1;
+    border-radius: 12px;
+    padding: 1rem;
     width: 100%;
-    height: 300px;
-    border-radius: var(--border-radius);
+    min-height: 120px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.description-field:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+    outline: none;
+}
+
+.preview-container {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.preview-container img {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.location-status {
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+.location-status.success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.location-status.error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Menu Toggle Animation */
+.menu-toggle span.active:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+
+.menu-toggle span.active:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-toggle span.active:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+
+/* Loading indicator */
+.loading {
+    display: none;
+    text-align: center;
     margin: 1rem 0;
+}
+
+.loading:after {
+    content: " ";
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin: 8px;
+    border-radius: 50%;
+    border: 6px solid var(--primary-color);
+    border-color: var(--primary-color) transparent var(--primary-color) transparent;
+    animation: loading 1.2s linear infinite;
+}
+
+@keyframes loading {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Mobile Menu Toggle */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    cursor: pointer;
+}
+
+.menu-toggle span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background-color: var(--text-color);
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    /* Navbar Responsive */
+    .menu-toggle {
+        display: flex;
+    }
+    
+    .nav-links {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        height: 0;
+        background: white;
+        flex-direction: column;
+        padding: 0;
+        overflow: hidden;
+        transition: height 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        z-index: 999;
+        display: none;
+    }
+    
+    .nav-links.active {
+        height: auto;
+        padding: 1rem 0;
+        display: flex;
+    }
+    
+    .nav-links a {
+        padding: 1rem 2rem;
+        width: 100%;
+        text-align: center;
+    }
+    
+    /* Hero Section Responsive */
+    .hero {
+        padding: 7rem 1rem 3rem;
+    }
+    
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .stat-card {
+        padding: 1.5rem 1rem;
+    }
+    
+    .hero-stats {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    /* Modal Responsive */
+    .modal-content {
+        width: 95%;
+        margin: 10% auto 5%;
+        padding: 1.5rem;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+    
+    .report-modal {
+        padding: 1rem;
+        width: 95%;
+        margin: 10px auto;
+    }
+    
+    /* Camera controls and forms */
+    .camera-controls {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .camera-controls button {
+        width: 100%;
+    }
+    
+    #map {
+        height: 250px;
+    }
+    
+    /* Auth container responsive */
+    .auth-container {
+        margin: 80px 20px;
+    }
+    
+    /* Improve form inputs for touch */
+    .form-control, 
+    .description-field {
+        font-size: 16px; /* Prevents iOS zoom on focus */
+    }
+    
+    .btn-primary, 
+    .btn-secondary {
+        padding: 0.8rem 1.5rem;
+        min-height: 44px; /* Better touch target */
+    }
+    
+    /* Make the close button easier to tap */
+    .close {
+        font-size: 2.5rem;
+        padding: 0.5rem;
+    }
+}
+
+/* Small Phone Optimization */
+@media (max-width: 480px) {
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .stat-card h3 {
+        font-size: 2rem;
+    }
+    
+    /* Camera feed max height */
+    #camera-feed,
+    .preview-container img {
+        max-height: 300px;
+    }
+    
+    /* Modal improvements */
+    .modal-content {
+        margin: 5% auto;
+        padding: 1rem;
+    }
 }

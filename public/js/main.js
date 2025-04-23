@@ -11,6 +11,8 @@ const photoCanvas = document.getElementById('photo-canvas');
 const locationStatus = document.getElementById('location-status');
 const loading = document.getElementById('loading');
 const mapContainer = document.getElementById('map');
+const menuToggle = document.querySelector('.menu-toggle');
+const navLinks = document.querySelector('.nav-links');
 
 let stream = null;
 let photoData = null;
@@ -31,11 +33,14 @@ function initMap() {
 // Camera setup
 async function setupCamera() {
     try {
+        // Check if this is a mobile device
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
         stream = await navigator.mediaDevices.getUserMedia({
             video: {
-                facingMode: 'environment',
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
+                facingMode: isMobile ? 'environment' : 'user',
+                width: { ideal: isMobile ? 1280 : 640 },
+                height: { ideal: isMobile ? 720 : 480 }
             },
             audio: false
         });
@@ -167,7 +172,7 @@ function getLocation() {
     }
 }
 
-// Handle form submission
+// Handle form submission - using the enhanced mobile-friendly version
 reportForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -181,7 +186,13 @@ reportForm.addEventListener('submit', async (e) => {
         return;
     }
     
+    // Show loading indicator
     loading.style.display = 'block';
+    
+    // Disable submit button to prevent double submission (common on mobile)
+    const submitBtn = reportForm.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
     
     try {
         const formData = new FormData();
@@ -215,5 +226,36 @@ reportForm.addEventListener('submit', async (e) => {
         alert('Error: ' + error.message);
     } finally {
         loading.style.display = 'none';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Report';
+    }
+});
+
+// Mobile menu toggle
+if (menuToggle) {
+    menuToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+        document.querySelectorAll('.menu-toggle span').forEach(bar => {
+            bar.classList.toggle('active');
+        });
+    });
+}
+
+// Close mobile menu when clicking a link
+document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+        if (navLinks.classList.contains('active')) {
+            navLinks.classList.remove('active');
+            document.querySelectorAll('.menu-toggle span').forEach(bar => {
+                bar.classList.remove('active');
+            });
+        }
+    });
+});
+
+// Improve map responsiveness by handling resize
+window.addEventListener('resize', () => {
+    if (map) {
+        map.invalidateSize();
     }
 });
