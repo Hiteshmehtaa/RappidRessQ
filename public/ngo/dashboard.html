@@ -568,6 +568,7 @@
     </div>
 
     <script>
+        let currentNGOId = null;
         // Check authentication
         const token = localStorage.getItem('ngoToken');
         if (!token) {
@@ -579,6 +580,7 @@
             localStorage.removeItem('ngoToken');
             window.location.href = '/ngo/login.html';
         }
+        
 
         // Show/hide sections
         function showSection(sectionId) {
@@ -592,6 +594,38 @@
             });
             document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
         }
+
+        function getActionButtonHtml(report) {
+    // Case 1: Report is pending - show "Take Action" button
+    if (report.status === 'pending') {
+        return `
+            <button class="action-button" onclick="updateReportStatus('${report._id}', 'in-progress')">
+                Take Action
+            </button>
+        `;
+    }
+    
+    // Case 2: Report is in progress and assigned to current NGO - show "Mark Complete" button
+    else if (report.status === 'in-progress' && report.assignedNGOId === currentNGOId) {
+        return `
+            <button class="action-button" onclick="completeReport('${report._id}')">
+                Mark Complete
+            </button>
+        `;
+    }
+    
+    // Case 3: Report is in progress but assigned to another NGO - show informative message
+    else if (report.status === 'in-progress') {
+        return `
+            <span style="color: #666; font-style: italic;">In progress by ${report.assignedNGO}</span>
+        `;
+    }
+    
+    // Case 4: Report is completed or any other status - show nothing
+    else {
+        return '';
+    }
+}
 
         document.querySelectorAll('.menu-item').forEach(item => {
             item.addEventListener('click', (e) => {
@@ -657,52 +691,58 @@
         }
 
         // Complete Report
-        async function completeReport(reportId) {
-            if (!confirm('Are you sure you want to mark this report as completed? This will remove it from the list.')) {
-                return;
-            }
+async function completeReport(reportId) {
+    if (!confirm('Are you sure you want to mark this report as completed? This will permanently remove it from all NGOs.')) {
+        return;
+    }
 
-            try {
-                const response = await fetch(`/api/ngo/reports/${reportId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ status: 'completed' })
-                });
+    try {
+        const response = await fetch(`/api/ngo/reports/${reportId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: 'completed' })
+        });
 
-                if (response.ok) {
-                    fetchData();
-                } else {
-                    throw new Error('Failed to complete report');
-                }
-            } catch (error) {
-                alert('Error completing report: ' + error.message);
-            }
+        if (response.ok) {
+            alert('Report has been successfully completed and removed.');
+            fetchData();
+        } else {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to complete report');
         }
-
+    } catch (error) {
+        alert('Error completing report: ' + error.message);
+    }
+}
         // Update Report Status
-        async function updateReportStatus(reportId, status) {
-            try {
-                const response = await fetch(`/api/ngo/reports/${reportId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ status })
-                });
+async function updateReportStatus(reportId, status) {
+    try {
+        // Only proceed with special handling for 'in-progress' status
+        // which requires assigning the current NGO
+        const response = await fetch(`/api/ngo/reports/${reportId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status })
+        });
 
-                if (response.ok) {
-                    fetchData();
-                } else {
-                    throw new Error('Failed to update status');
-                }
-            } catch (error) {
-                alert('Error updating status: ' + error.message);
+        if (response.ok) {
+            if (status === 'in-progress') {
+                alert('You have been assigned to this report. Other NGOs will see that you are working on it.');
             }
+            fetchData();
+        } else {
+            throw new Error('Failed to update status');
         }
+    } catch (error) {
+        alert('Error updating status: ' + error.message);
+    }
+}
 
         // Add Animal Form Submission
         document.getElementById('addAnimalForm').addEventListener('submit', async (e) => {
@@ -739,39 +779,37 @@
         // Fetch and update data
         async function fetchData() {
             try {
-                const [reportsRes, adoptionsRes, volunteersRes, animalsRes] = await Promise.all([
-                    fetch('/api/ngo/dashboard/reports', { 
-                        headers: { 
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    }),
-                    fetch('/api/ngo/dashboard/adoptions', { 
-                        headers: { 
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    }),
-                    fetch('/api/ngo/dashboard/volunteers', { 
-                        headers: { 
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    }),
-                    fetch('/api/ngo/animals', { 
-                        headers: { 
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                ]);
+                        // Your existing fetch calls for reports, adoptions, etc.
+        const [reportsRes, adoptionsRes, volunteersRes, animalsRes, ngoInfoRes] = await Promise.all([
+            fetch('/api/ngo/dashboard/reports', { 
+                headers: { 'Authorization': `Bearer ${token}` }
+            }),
+            fetch('/api/ngo/dashboard/adoptions', { 
+                headers: { 'Authorization': `Bearer ${token}` }
+            }),
+            fetch('/api/ngo/dashboard/volunteers', { 
+                headers: { 'Authorization': `Bearer ${token}` }
+            }),
+            fetch('/api/ngo/animals', { 
+                headers: { 'Authorization': `Bearer ${token}` }
+            }),
+            // Add this new fetch for current NGO info
+            fetch('/api/ngo/current', { 
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+        ]);
 
-                const [reports, adoptions, volunteers, animals] = await Promise.all([
-                    reportsRes.json(),
-                    adoptionsRes.json(),
-                    volunteersRes.json(),
-                    animalsRes.json()
-                ]);
+        // Parse all responses
+        const [reports, adoptions, volunteers, animals, ngoInfo] = await Promise.all([
+            reportsRes.json(),
+            adoptionsRes.json(),
+            volunteersRes.json(),
+            animalsRes.json(),
+            ngoInfoRes.json()
+        ]);
+
+        // Store the current NGO's ID for later use
+        currentNGOId = ngoInfo._id;
 
                 // Update overview stats
                 document.getElementById('totalReports').textContent = reports.length;

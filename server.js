@@ -128,9 +128,20 @@ app.get('/api/ngo/dashboard/reports', verifyToken, async (req, res) => {
 
 app.get('/api/ngo/dashboard/adoptions', verifyToken, async (req, res) => {
   try {
+    console.log('Looking for adoptions with NGO ID:', req.ngo.id);
+    
+    // Find all adoptions
+    const allAdoptions = await AdoptionApplication.find({}).lean();
+    console.log('All adoption applications in system:', allAdoptions.length);
+    console.log('Sample ngoIds in system:', allAdoptions.slice(0, 3).map(a => a.ngoId));
+    
+    // Now filter for this specific NGO
     const adoptions = await AdoptionApplication.find({ ngoId: req.ngo.id }).sort({ createdAt: -1 });
+    console.log('Found adoptions for this NGO:', adoptions.length);
+    
     res.json(adoptions);
   } catch (error) {
+    console.error('Error fetching adoptions:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -175,19 +186,6 @@ app.post('/api/ngo/animals', verifyToken, upload.single('photo'), async (req, re
   }
 });
 
-// Update report status
-app.put('/api/ngo/reports/:id', verifyToken, async (req, res) => {
-  try {
-    const report = await Report.findOneAndUpdate(
-      { _id: req.params.id },
-      { status: req.body.status },
-      { new: true }
-    );
-    res.json(report);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
 
 // Update adoption status
 app.put('/api/ngo/adoptions/:id', verifyToken, async (req, res) => {
@@ -251,26 +249,35 @@ app.post('/api/reports', upload.single('photo'), async (req, res) => {
   }
 });
 
-// Submit adoption application
 app.post('/api/adopt', async (req, res) => {
   try {
+    // Check if petId is valid ObjectId
+    if (!req.body.petId || !mongoose.Types.ObjectId.isValid(req.body.petId)) {
+      return res.status(400).json({ 
+        message: 'Valid Pet ID is required (must be a MongoDB ObjectId)' 
+      });
+    }
+    
     const application = new AdoptionApplication({
-      ...req.body,
-      ngoId: req.body.ngoId
+      ...req.body
     });
+    
     await application.save();
 
     // Create notification for the specific NGO
-    const notification = new Notification({
-      type: 'adoption',
-      message: `New adoption application for ${req.body.petName}`,
-      ngoId: req.body.ngoId
-    });
-    await notification.save();
+    if (req.body.ngoId && mongoose.Types.ObjectId.isValid(req.body.ngoId)) {
+      const notification = new Notification({
+        type: 'adoption',
+        message: `New adoption application for ${req.body.petName}`,
+        ngoId: req.body.ngoId
+      });
+      await notification.save();
+    }
 
-    res.status(201).json(application);
+    res.status(201).json({ success: true, application });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Adoption submission error:', error);
+    res.status(500).json({ message: 'Failed to submit application', error: error.message });
   }
 });
 
@@ -365,38 +372,27 @@ app.listen(PORT, () => {
 
 // Get all available animals for adoption
 app.get('/api/animals', async (req, res) => {
-    try {
-        const animals = await Animal.aggregate([
-            {
-                $match: { status: 'available' }
-            },
-            {
-                $lookup: {
-                    from: 'ngos',
-                    localField: 'ngoId',
-                    foreignField: '_id',
-                    as: 'ngo'
-                }
-            },
-            {
-                $unwind: '$ngo'
-            },
-            {
-                $project: {
-                    name: 1,
-                    breed: 1,
-                    age: 1,
-                    image: 1,
-                    status: 1,
-                    ngoId: 1,
-                    ngoName: '$ngo.name'
-                }
-            }
-        ]);
-        res.json(animals);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+  try {
+      const animals = await Animal.find({ 
+          status: 'available' 
+      }).populate('ngoId', 'name').lean();
+      
+      // Format the response to include NGO information
+      const formattedAnimals = animals.map(animal => ({
+          _id: animal._id,
+          name: animal.name,
+          breed: animal.breed,
+          age: animal.age,
+          image: animal.image,
+          ngoId: animal.ngoId._id, // Make sure this is the actual MongoDB ID
+          ngoName: animal.ngoId.name
+      }));
+      
+      res.json(formattedAnimals);
+  } catch (error) {
+      console.error('Error fetching animals:', error);
+      res.status(500).json({ error: error.message });
+  }
 });
 // Delete animals
 
@@ -417,35 +413,66 @@ app.delete('/api/ngo/animals/:id', verifyToken, async (req, res) => {
   }
 });
 
-// Update report status and assign NGO
+/// Update report status and assign NGO
 app.put('/api/ngo/reports/:id', verifyToken, async (req, res) => {
-    try {
-        const { status } = req.body;
-        const ngo = await NGO.findById(req.ngo.id);
-        
-        if (status === 'in-progress') {
-            const report = await Report.findByIdAndUpdate(
-                req.params.id,
-                { 
-                    status,
-                    assignedNGOId: req.ngo.id,
-                    assignedNGO: ngo.name
-                },
-                { new: true }
-            );
-            res.json(report);
-        } else if (status === 'completed') {
-            await Report.findByIdAndDelete(req.params.id);
-            res.json({ message: 'Report completed and removed' });
-        } else {
-            const report = await Report.findByIdAndUpdate(
-                req.params.id,
-                { status },
-                { new: true }
-            );
-            res.json(report);
-        }
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+  try {
+      const { status } = req.body;
+      const ngo = await NGO.findById(req.ngo.id);
+      
+      // For new assignments (taking action)
+      if (status === 'in-progress') {
+          const report = await Report.findByIdAndUpdate(
+              req.params.id,
+              { 
+                  status,
+                  assignedNGOId: req.ngo.id,
+                  assignedNGO: ngo.name
+              },
+              { new: true }
+          );
+          res.json(report);
+      } 
+      // For completing reports - verify the NGO is authorized
+      else if (status === 'completed') {
+          // First find the report
+          const report = await Report.findById(req.params.id);
+          
+          // Check if the report exists
+          if (!report) {
+              return res.status(404).json({ error: 'Report not found' });
+          }
+          
+          // Check if the current NGO is the assigned NGO
+          if (report.assignedNGOId && report.assignedNGOId.toString() !== req.ngo.id) {
+              return res.status(403).json({ 
+                  error: 'Unauthorized: Only the assigned NGO can mark this report as complete' 
+              });
+          }
+          
+          // If authorized, delete the report
+          await Report.findByIdAndDelete(req.params.id);
+          res.json({ message: 'Report completed and removed' });
+      } 
+      // For other status updates
+      else {
+          const report = await Report.findByIdAndUpdate(
+              req.params.id,
+              { status },
+              { new: true }
+          );
+          res.json(report);
+      }
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+});
+
+
+app.get('/api/ngo/current', verifyToken, async (req, res) => {
+  try {
+      const ngo = await NGO.findById(req.ngo.id);
+      res.json({ _id: ngo._id, name: ngo.name });
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
 });
